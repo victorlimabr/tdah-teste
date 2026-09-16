@@ -1,6 +1,6 @@
 import '../data/asrs_questions.dart';
-import 'question.dart';
-import 'quiz_result.dart';
+import '../data/models/question.dart';
+import '../data/models/quiz_result.dart';
 
 /// Mantém as respostas do usuário durante todo o fluxo do teste
 /// (Parte A e Parte B), compartilhado entre as telas.

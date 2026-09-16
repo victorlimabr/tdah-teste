@@ -1,4 +1,4 @@
-import '../data/asrs_questions.dart';
+import '../asrs_questions.dart';
 import 'question.dart';
 
 /// Resultado calculado a partir das respostas do questionário.

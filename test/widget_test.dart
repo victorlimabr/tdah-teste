@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:tdah_teste/data/asrs_questions.dart';
 import 'package:tdah_teste/main.dart';
-import 'package:tdah_teste/models/quiz_result.dart';
+import 'package:tdah_teste/data/models/quiz_result.dart';
 
 void main() {
   testWidgets('Onboarding mostra o título de boas-vindas e o botão Próximo',
