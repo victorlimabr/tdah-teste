@@ -94,6 +94,7 @@ A pontuação segue fielmente a regra da escala ASRS-18:
 | Design | Material 3 |
 | Tipografia | [google_fonts](https://pub.dev/packages/google_fonts) (Inter) |
 | Estado / Injeção de dependência | [provider](https://pub.dev/packages/provider) |
+| Navegação | [go_router](https://pub.dev/packages/go_router) |
 | Ícones | [cupertino_icons](https://pub.dev/packages/cupertino_icons) |
 | Lints | [flutter_lints](https://pub.dev/packages/flutter_lints) |
 | Testes | flutter_test |
@@ -120,6 +121,7 @@ lib/
 │   ├── models/               # Question, QuizResult
 │   ├── repositories/         # QuestionRepository (fonte da verdade)
 │   └── asrs_questions.dart   # Dados das 18 perguntas
+├── routing/                  # GoRouter (rotas do fluxo)
 └── main.dart                 # Injeção de dependência (provider)
 ```
 
@@ -127,6 +129,7 @@ lib/
 - **ViewModel** (`QuizViewModel`, um `ChangeNotifier`) mantém as respostas e o estado derivado (rastreio, resultado) e expõe *commands* (`selectAnswer`, `reset`).
 - **Repository** (`QuestionRepository`) abstrai a fonte das perguntas.
 - O estado é compartilhado entre as telas via [`provider`](https://pub.dev/packages/provider), e o fluxo de dados é **unidirecional** (dados → UI; interações → ViewModel).
+- A navegação é **declarativa** com [`go_router`](https://pub.dev/packages/go_router): as rotas ficam centralizadas em `routing/`, as telas não se importam entre si e a versão web ganha URLs reais por tela.
 
 ---
 
@@ -225,7 +228,10 @@ tdah-teste/
 │   │       ├── view/                     # intro, quiz, transição, resultado
 │   │       └── view_model/
 │   │           └── quiz_view_model.dart  # Estado do teste (MVVM)
-│   └── main.dart                         # Injeção de dependência (provider)
+│   ├── routing/
+│   │   ├── app_router.dart               # Configuração do GoRouter
+│   │   └── routes.dart                   # Caminhos das rotas
+│   └── main.dart                         # DI (provider) + MaterialApp.router
 ├── test/
 │   ├── quiz_view_model_test.dart   # Testes de unidade do ViewModel
 │   └── widget_test.dart            # Testes de widget e da pontuação
