@@ -96,6 +96,7 @@ A pontuação segue fielmente a regra da escala ASRS-18:
 | Tipografia | [google_fonts](https://pub.dev/packages/google_fonts) (Inter) |
 | Estado / Injeção de dependência | [provider](https://pub.dev/packages/provider) |
 | Navegação | [go_router](https://pub.dev/packages/go_router) |
+| Persistência local | [shared_preferences](https://pub.dev/packages/shared_preferences) |
 | Ícones | [cupertino_icons](https://pub.dev/packages/cupertino_icons) |
 | Lints | [flutter_lints](https://pub.dev/packages/flutter_lints) |
 | Testes | flutter_test |
@@ -216,9 +217,11 @@ tdah-teste/
 │   │   ├── asrs_questions.dart      # As 18 perguntas do ASRS-18
 │   │   ├── models/
 │   │   │   ├── question.dart        # Modelo de pergunta (com área sombreada)
-│   │   │   └── quiz_result.dart     # Cálculo do resultado da triagem
+│   │   │   ├── quiz_result.dart     # Cálculo do resultado da triagem
+│   │   │   └── quiz_progress.dart   # Snapshot do progresso (retomar)
 │   │   └── repositories/
-│   │       └── question_repository.dart  # Fonte da verdade das perguntas
+│   │       ├── question_repository.dart       # Fonte da verdade das perguntas
+│   │       └── quiz_progress_repository.dart   # Progresso salvo (shared_preferences)
 │   ├── ui/
 │   │   ├── core/
 │   │   │   ├── theme/app_theme.dart      # Cores e tema Material 3
@@ -251,10 +254,10 @@ Estado atual da arquitetura e próximos passos planejados:
 - ✅ Fluxo completo do teste (onboarding → Parte A → transição → Parte B → resultado)
 - ✅ Arquitetura **MVVM** (View + ViewModel + Repository)
 - ✅ Estado com **provider** e navegação declarativa com **go_router**
+- ✅ **Persistência das respostas** com [`shared_preferences`](https://pub.dev/packages/shared_preferences) — o progresso é salvo automaticamente e a tela inicial mostra um banner **"Continuar de onde parei"** que retoma o teste no cartão exato
 - ✅ Testes de unidade e de widget
 
 **Planejado**
-- ⏳ **Persistência das respostas** com [`shared_preferences`](https://pub.dev/packages/shared_preferences) — salvar o progresso para retomar o teste caso o app seja fechado (camada `data/services` + `data/repositories`).
 - ⏳ **CI (GitHub Actions)** — rodar `flutter analyze` + `flutter test` a cada Pull Request.
 - ⏳ **Guard de rota** — impedir o acesso direto ao resultado sem responder o teste.
 - ⏳ **Compartilhar o resultado**.
