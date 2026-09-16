@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_buttons.dart';
+import '../../core/widgets/centered_scroll_view.dart';
 import '../../core/widgets/highlight_text.dart';
 import '../../core/widgets/tdah_logo.dart';
 import '../view_model/quiz_view_model.dart';
@@ -26,8 +27,7 @@ class PartIntroScreen extends StatelessWidget {
                 child: Align(alignment: Alignment.centerLeft, child: TdahLogo()),
               ),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: CenteredScrollView(
                   children: [
                     Image.asset('assets/images/group_hug.png', height: 240),
                     const SizedBox(height: 40),
