@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../routing/routes.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_buttons.dart';
 import '../../core/widgets/centered_scroll_view.dart';
@@ -36,7 +38,7 @@ class ResultScreen extends StatelessWidget {
             Seg('profissional de saúde.', hl: true),
           ]);
 
-    void finish() => Navigator.of(context).popUntil((r) => r.isFirst);
+    void finish() => context.go(Routes.onboarding);
 
     return Scaffold(
       body: SafeArea(

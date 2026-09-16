@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'data/repositories/question_repository.dart';
+import 'routing/app_router.dart';
 import 'ui/core/theme/app_theme.dart';
-import 'ui/onboarding/onboarding_screen.dart';
 import 'ui/quiz/view_model/quiz_view_model.dart';
 
 void main() {
@@ -22,12 +22,12 @@ class TdahTesteApp extends StatelessWidget {
           create: (context) => QuizViewModel(context.read<QuestionRepository>()),
         ),
       ],
-      child: MaterialApp(
+      child: MaterialApp.router(
         title: 'Teste TDAH',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light(),
         themeMode: ThemeMode.light,
-        home: const OnboardingScreen(),
+        routerConfig: appRouter,
       ),
     );
   }

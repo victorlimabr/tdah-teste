@@ -6,6 +6,8 @@ import 'package:tdah_teste/data/asrs_questions.dart';
 import 'package:tdah_teste/data/models/quiz_result.dart';
 import 'package:tdah_teste/data/repositories/question_repository.dart';
 import 'package:tdah_teste/main.dart';
+import 'package:tdah_teste/routing/app_router.dart';
+import 'package:tdah_teste/routing/routes.dart';
 import 'package:tdah_teste/ui/quiz/view/part_intro_screen.dart';
 import 'package:tdah_teste/ui/quiz/view_model/quiz_view_model.dart';
 
@@ -38,16 +40,19 @@ void main() {
             create: (c) => QuizViewModel(c.read<QuestionRepository>()),
           ),
         ],
-        child: const MaterialApp(home: PartIntroScreen()),
+        child: MaterialApp.router(
+          routerConfig: createAppRouter(initialLocation: Routes.intro),
+        ),
       ),
     );
+    await tester.pumpAndSettle();
 
     expect(find.text('Parte A'), findsOneWidget);
 
     await tester.tap(find.text('Começar o teste'));
     await tester.pumpAndSettle();
 
-    // Chegou ao primeiro card de pergunta (opções renderizadas).
+    // Navegou para /quiz/a e renderizou o primeiro card.
     expect(find.text('Nunca'), findsOneWidget);
     expect(find.text('Próxima pergunta'), findsOneWidget);
   });
