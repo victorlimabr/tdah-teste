@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../routing/routes.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_buttons.dart';
 import '../../core/widgets/centered_scroll_view.dart';
 import '../../core/widgets/highlight_text.dart';
 import '../../core/widgets/tdah_logo.dart';
 import '../view_model/quiz_view_model.dart';
-import 'quiz_screen.dart';
 
 /// Tela de transição entre a Parte A e a Parte B ("Parabéns!").
 ///
@@ -39,17 +40,7 @@ class TransitionScreen extends StatelessWidget {
             Seg('não é obrigatória.', hl: true),
           ]);
 
-    void goToPartB() {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => QuizScreen(
-            questions: viewModel.partB,
-            partLabel: 'Parte B',
-            isLastPart: true,
-          ),
-        ),
-      );
-    }
+    void goToPartB() => context.go(Routes.quizPartB);
 
     return Scaffold(
       body: SafeArea(
@@ -97,8 +88,7 @@ class TransitionScreen extends StatelessWidget {
               if (!positive)
                 TextLinkButton(
                   label: 'Sair',
-                  onPressed: () =>
-                      Navigator.of(context).popUntil((r) => r.isFirst),
+                  onPressed: () => context.go(Routes.onboarding),
                 ),
               const SizedBox(height: 16),
             ],
