@@ -38,6 +38,9 @@ dependencies:
   # Fonte Inter (usada no design do Figma).
   google_fonts: ^6.2.1
 
+  # Gerenciamento de estado (MVVM) e injeção de dependência.
+  provider: ^6.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
