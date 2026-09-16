@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/models/question.dart';
+import '../../../routing/routes.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_buttons.dart';
 import '../../core/widgets/indicators.dart';
@@ -25,8 +26,27 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  final PageController _controller = PageController();
-  int _page = 0;
+  late final PageController _controller;
+  late int _page;
+  late final String _location;
+
+  @override
+  void initState() {
+    super.initState();
+    final viewModel = context.read<QuizViewModel>();
+    final isPartA = widget.part == QuizPart.a;
+    _location = isPartA ? Routes.quizPartA : Routes.quizPartB;
+    final total = (isPartA ? viewModel.partA : viewModel.partB).length;
+    // Retoma no cartão salvo quando a rota salva corresponde a esta parte.
+    final resume = viewModel.currentLocation == _location
+        ? viewModel.currentQuestionIndex.clamp(0, total - 1)
+        : 0;
+    _page = resume;
+    _controller = PageController(initialPage: resume);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<QuizViewModel>().setPosition(_location, _page);
+    });
+  }
 
   @override
   void dispose() {
@@ -53,8 +73,14 @@ class _QuizScreenState extends State<QuizScreen> {
         );
         return;
       }
-      // Conclusão da parte: Parte A -> transição; Parte B -> resultado.
-      context.go(isPartA ? '/transition' : '/result');
+      // Conclusão da parte.
+      if (isPartA) {
+        viewModel.setPosition(Routes.transition, 0);
+        context.go(Routes.transition);
+      } else {
+        viewModel.clearProgress();
+        context.go(Routes.result);
+      }
     }
 
     return Scaffold(
@@ -71,7 +97,10 @@ class _QuizScreenState extends State<QuizScreen> {
                 child: PageView.builder(
                   controller: _controller,
                   itemCount: questions.length,
-                  onPageChanged: (i) => setState(() => _page = i),
+                  onPageChanged: (i) {
+                    setState(() => _page = i);
+                    context.read<QuizViewModel>().setPosition(_location, i);
+                  },
                   itemBuilder: (context, index) {
                     final q = questions[index];
                     return _QuestionPage(
