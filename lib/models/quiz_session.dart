@@ -33,5 +33,5 @@ class QuizSession {
   }
 
   /// Resultado final considerando todas as respostas.
-  QuizResult get result => QuizResult.fromAnswers(answers);
+  QuizResult get result => QuizResult.fromAnswers(kQuestions, answers);
 }

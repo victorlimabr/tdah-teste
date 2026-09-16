@@ -24,7 +24,7 @@ void main() {
   group('Cálculo do resultado', () {
     test('Todas "Nunca" resulta em rastreio negativo', () {
       final answers = List<int?>.filled(kQuestions.length, 0);
-      final result = QuizResult.fromAnswers(answers);
+      final result = QuizResult.fromAnswers(kQuestions, answers);
 
       expect(result.partAShaded, 0);
       expect(result.isScreenPositive, isFalse);
@@ -32,7 +32,7 @@ void main() {
 
     test('Todas "Sempre" resulta em rastreio positivo', () {
       final answers = List<int?>.filled(kQuestions.length, 4);
-      final result = QuizResult.fromAnswers(answers);
+      final result = QuizResult.fromAnswers(kQuestions, answers);
 
       expect(result.partAShaded, 6);
       expect(result.isScreenPositive, isTrue);
@@ -42,10 +42,10 @@ void main() {
 
     test('Rastreio positivo exige 4+ marcações na área sombreada da Parte A',
         () {
-      // Responde "De vez em quando" (índice 2) em tudo.
+      // Responde "Às vezes" (índice 2) em tudo.
       // Parte A: perguntas 1-3 têm shadedFrom 2 (contam), 4-6 têm 3 (não).
       final answers = List<int?>.filled(kQuestions.length, 2);
-      final result = QuizResult.fromAnswers(answers);
+      final result = QuizResult.fromAnswers(kQuestions, answers);
 
       expect(result.partAShaded, 3);
       expect(result.isScreenPositive, isFalse);
