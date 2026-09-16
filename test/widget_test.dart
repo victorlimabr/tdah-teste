@@ -52,6 +52,31 @@ void main() {
     expect(find.text('Próxima pergunta'), findsOneWidget);
   });
 
+  testWidgets('telas centralizadas não estouram em tela baixa',
+      (WidgetTester tester) async {
+    // Tela bem baixa/estreita — reproduz o cenário que causava overflow.
+    tester.view.physicalSize = const Size(1080, 1280);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<QuestionRepository>(create: (_) => AsrsQuestionRepository()),
+          ChangeNotifierProvider<QuizViewModel>(
+            create: (c) => QuizViewModel(c.read<QuestionRepository>()),
+          ),
+        ],
+        child: const MaterialApp(home: PartIntroScreen()),
+      ),
+    );
+
+    // Sem CenteredScrollView isto lançaria "RenderFlex overflowed".
+    expect(tester.takeException(), isNull);
+    expect(find.text('Parte A'), findsOneWidget);
+  });
+
   test('Há 18 perguntas, sendo 6 na Parte A', () {
     expect(kQuestions.length, 18);
     expect(kQuestions.where((q) => q.isPartA).length, 6);
