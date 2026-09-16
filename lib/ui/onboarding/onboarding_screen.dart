@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_theme.dart';
-import '../widgets/app_buttons.dart';
-import '../widgets/highlight_text.dart';
-import '../widgets/indicators.dart';
-import '../widgets/tdah_logo.dart';
-import 'part_intro_screen.dart';
+import '../core/theme/app_theme.dart';
+import '../core/widgets/app_buttons.dart';
+import '../core/widgets/highlight_text.dart';
+import '../core/widgets/indicators.dart';
+import '../core/widgets/tdah_logo.dart';
+import '../quiz/view/part_intro_screen.dart';
 
 /// Fluxo de introdução: 3 telas deslizáveis (bem-vindo, como funciona,
 /// aviso importante), fiéis ao protótipo.
