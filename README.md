@@ -18,6 +18,7 @@
 - [Como Executar](#como-executar)
 - [Como Fazer o Build](#como-fazer-o-build)
 - [Estrutura do Projeto](#estrutura-do-projeto)
+- [Roadmap](#roadmap)
 - [Referências](#referências)
 
 ---
@@ -239,6 +240,24 @@ tdah-teste/
 ├── pubspec.yaml
 └── README.md
 ```
+
+---
+
+## Roadmap
+
+Estado atual da arquitetura e próximos passos planejados:
+
+**Já implementado**
+- ✅ Fluxo completo do teste (onboarding → Parte A → transição → Parte B → resultado)
+- ✅ Arquitetura **MVVM** (View + ViewModel + Repository)
+- ✅ Estado com **provider** e navegação declarativa com **go_router**
+- ✅ Testes de unidade e de widget
+
+**Planejado**
+- ⏳ **Persistência das respostas** com [`shared_preferences`](https://pub.dev/packages/shared_preferences) — salvar o progresso para retomar o teste caso o app seja fechado (camada `data/services` + `data/repositories`).
+- ⏳ **CI (GitHub Actions)** — rodar `flutter analyze` + `flutter test` a cada Pull Request.
+- ⏳ **Guard de rota** — impedir o acesso direto ao resultado sem responder o teste.
+- ⏳ **Compartilhar o resultado**.
 
 ---
 
