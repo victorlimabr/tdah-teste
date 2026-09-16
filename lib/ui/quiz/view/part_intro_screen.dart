@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../models/quiz_session.dart';
-import '../theme/app_theme.dart';
-import '../widgets/app_buttons.dart';
-import '../widgets/highlight_text.dart';
-import '../widgets/tdah_logo.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_buttons.dart';
+import '../../core/widgets/highlight_text.dart';
+import '../../core/widgets/tdah_logo.dart';
+import '../view_model/quiz_view_model.dart';
 import 'quiz_screen.dart';
 
 /// Tela de introdução da Parte A, com a ilustração e o resumo do que vem.
@@ -53,12 +54,12 @@ class PartIntroScreen extends StatelessWidget {
               PrimaryButton(
                 label: 'Começar o teste',
                 onPressed: () {
-                  final session = QuizSession();
+                  final viewModel = context.read<QuizViewModel>();
+                  viewModel.reset();
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => QuizScreen(
-                        session: session,
-                        questions: session.partA,
+                        questions: viewModel.partA,
                         partLabel: 'Parte A',
                       ),
                     ),

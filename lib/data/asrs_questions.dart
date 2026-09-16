@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/question.dart';
+import 'models/question.dart';
 
 /// As 18 perguntas do ASRS-18 (ASRS-v1.1), na ordem oficial.
 ///

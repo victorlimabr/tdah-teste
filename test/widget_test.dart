@@ -1,8 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 
 import 'package:tdah_teste/data/asrs_questions.dart';
+import 'package:tdah_teste/data/models/quiz_result.dart';
+import 'package:tdah_teste/data/repositories/question_repository.dart';
 import 'package:tdah_teste/main.dart';
-import 'package:tdah_teste/models/quiz_result.dart';
+import 'package:tdah_teste/ui/quiz/view/part_intro_screen.dart';
+import 'package:tdah_teste/ui/quiz/view_model/quiz_view_model.dart';
 
 void main() {
   testWidgets('Onboarding mostra o título de boas-vindas e o botão Próximo',
@@ -16,6 +21,37 @@ void main() {
     expect(find.text('Próximo'), findsOneWidget);
   });
 
+  testWidgets('fluxo do quiz acessa o QuizViewModel via provider',
+      (WidgetTester tester) async {
+    // Usa um tamanho de tela realista de celular (a janela padrão de teste
+    // é 800x600, baixa e larga demais para um app mobile).
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<QuestionRepository>(create: (_) => AsrsQuestionRepository()),
+          ChangeNotifierProvider<QuizViewModel>(
+            create: (c) => QuizViewModel(c.read<QuestionRepository>()),
+          ),
+        ],
+        child: const MaterialApp(home: PartIntroScreen()),
+      ),
+    );
+
+    expect(find.text('Parte A'), findsOneWidget);
+
+    await tester.tap(find.text('Começar o teste'));
+    await tester.pumpAndSettle();
+
+    // Chegou ao primeiro card de pergunta (opções renderizadas).
+    expect(find.text('Nunca'), findsOneWidget);
+    expect(find.text('Próxima pergunta'), findsOneWidget);
+  });
+
   test('Há 18 perguntas, sendo 6 na Parte A', () {
     expect(kQuestions.length, 18);
     expect(kQuestions.where((q) => q.isPartA).length, 6);
@@ -24,7 +60,7 @@ void main() {
   group('Cálculo do resultado', () {
     test('Todas "Nunca" resulta em rastreio negativo', () {
       final answers = List<int?>.filled(kQuestions.length, 0);
-      final result = QuizResult.fromAnswers(answers);
+      final result = QuizResult.fromAnswers(kQuestions, answers);
 
       expect(result.partAShaded, 0);
       expect(result.isScreenPositive, isFalse);
@@ -32,7 +68,7 @@ void main() {
 
     test('Todas "Sempre" resulta em rastreio positivo', () {
       final answers = List<int?>.filled(kQuestions.length, 4);
-      final result = QuizResult.fromAnswers(answers);
+      final result = QuizResult.fromAnswers(kQuestions, answers);
 
       expect(result.partAShaded, 6);
       expect(result.isScreenPositive, isTrue);
@@ -42,10 +78,10 @@ void main() {
 
     test('Rastreio positivo exige 4+ marcações na área sombreada da Parte A',
         () {
-      // Responde "De vez em quando" (índice 2) em tudo.
+      // Responde "Às vezes" (índice 2) em tudo.
       // Parte A: perguntas 1-3 têm shadedFrom 2 (contam), 4-6 têm 3 (não).
       final answers = List<int?>.filled(kQuestions.length, 2);
-      final result = QuizResult.fromAnswers(answers);
+      final result = QuizResult.fromAnswers(kQuestions, answers);
 
       expect(result.partAShaded, 3);
       expect(result.isScreenPositive, isFalse);

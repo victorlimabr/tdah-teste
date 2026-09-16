@@ -93,6 +93,7 @@ A pontuação segue fielmente a regra da escala ASRS-18:
 | Linguagem | [Dart](https://dart.dev) 3.6.0 |
 | Design | Material 3 |
 | Tipografia | [google_fonts](https://pub.dev/packages/google_fonts) (Inter) |
+| Estado / Injeção de dependência | [provider](https://pub.dev/packages/provider) |
 | Ícones | [cupertino_icons](https://pub.dev/packages/cupertino_icons) |
 | Lints | [flutter_lints](https://pub.dev/packages/flutter_lints) |
 | Testes | flutter_test |
@@ -103,21 +104,29 @@ A pontuação segue fielmente a regra da escala ASRS-18:
 
 ## Arquitetura
 
-Por se tratar de um app pequeno, a organização atual é **por camadas (layer-first)**, com separação clara entre dados, apresentação e componentes:
+O app segue o padrão **MVVM enxuto** recomendado pela documentação oficial do Flutter para apps pequenos, com organização **feature-first** e separação entre a camada de UI e a de dados:
 
 ```
 lib/
-├── data/       # Dados estáticos do teste (as 18 perguntas do ASRS-18)
-├── models/     # Modelos e regras de negócio (pergunta, cálculo, sessão)
-├── screens/    # Telas do fluxo (onboarding, intro, quiz, transição, resultado)
-├── widgets/    # Componentes reutilizáveis (logo, botões, indicadores, textos)
-├── theme/      # Tema Material 3 e paleta de cores do design
-└── main.dart   # Ponto de entrada
+├── ui/
+│   ├── core/                 # Tema e componentes compartilhados
+│   │   ├── theme/
+│   │   └── widgets/
+│   ├── onboarding/           # View do onboarding
+│   └── quiz/
+│       ├── view/             # Views (intro, quiz, transição, resultado)
+│       └── view_model/       # QuizViewModel (ChangeNotifier)
+├── data/
+│   ├── models/               # Question, QuizResult
+│   ├── repositories/         # QuestionRepository (fonte da verdade)
+│   └── asrs_questions.dart   # Dados das 18 perguntas
+└── main.dart                 # Injeção de dependência (provider)
 ```
 
-O estado do teste (respostas do usuário) é mantido em uma `QuizSession` compartilhada entre as telas, e a navegação usa o `Navigator` do Flutter.
-
-> 🔧 Está prevista uma refatoração para o padrão **MVVM enxuto** recomendado pela documentação oficial do Flutter (View + ViewModel + Repository), separando as camadas de UI e de dados.
+- **View** (widgets) apenas exibe o estado e captura interações.
+- **ViewModel** (`QuizViewModel`, um `ChangeNotifier`) mantém as respostas e o estado derivado (rastreio, resultado) e expõe *commands* (`selectAnswer`, `reset`).
+- **Repository** (`QuestionRepository`) abstrai a fonte das perguntas.
+- O estado é compartilhado entre as telas via [`provider`](https://pub.dev/packages/provider), e o fluxo de dados é **unidirecional** (dados → UI; interações → ViewModel).
 
 ---
 
@@ -200,27 +209,26 @@ tdah-teste/
 │   └── screenshots/               # Capturas de tela usadas no README
 ├── lib/
 │   ├── data/
-│   │   └── asrs_questions.dart     # As 18 perguntas do ASRS-18
-│   ├── models/
-│   │   ├── question.dart           # Modelo de pergunta (com área sombreada)
-│   │   ├── quiz_result.dart        # Cálculo do resultado da triagem
-│   │   └── quiz_session.dart       # Respostas do usuário durante o fluxo
-│   ├── screens/
-│   │   ├── onboarding_screen.dart  # Introdução em 3 telas
-│   │   ├── part_intro_screen.dart  # Introdução da Parte A
-│   │   ├── quiz_screen.dart        # Cartões de pergunta (Parte A e B)
-│   │   ├── transition_screen.dart  # Transição entre as partes
-│   │   └── result_screen.dart      # Tela de resultado
-│   ├── widgets/
-│   │   ├── tdah_logo.dart          # Logo "TD/AH"
-│   │   ├── indicators.dart         # Indicadores de progresso
-│   │   ├── app_buttons.dart        # Botões-pílula
-│   │   └── highlight_text.dart     # Texto com destaques
-│   ├── theme/
-│   │   └── app_theme.dart          # Cores e tema Material 3
-│   └── main.dart
+│   │   ├── asrs_questions.dart      # As 18 perguntas do ASRS-18
+│   │   ├── models/
+│   │   │   ├── question.dart        # Modelo de pergunta (com área sombreada)
+│   │   │   └── quiz_result.dart     # Cálculo do resultado da triagem
+│   │   └── repositories/
+│   │       └── question_repository.dart  # Fonte da verdade das perguntas
+│   ├── ui/
+│   │   ├── core/
+│   │   │   ├── theme/app_theme.dart      # Cores e tema Material 3
+│   │   │   └── widgets/                  # Logo, botões, indicadores, textos
+│   │   ├── onboarding/
+│   │   │   └── onboarding_screen.dart    # Introdução em 3 telas
+│   │   └── quiz/
+│   │       ├── view/                     # intro, quiz, transição, resultado
+│   │       └── view_model/
+│   │           └── quiz_view_model.dart  # Estado do teste (MVVM)
+│   └── main.dart                         # Injeção de dependência (provider)
 ├── test/
-│   └── widget_test.dart            # Testes de unidade e smoke test
+│   ├── quiz_view_model_test.dart   # Testes de unidade do ViewModel
+│   └── widget_test.dart            # Testes de widget e da pontuação
 ├── android/  ·  ios/  ·  web/       # Configurações por plataforma
 ├── pubspec.yaml
 └── README.md

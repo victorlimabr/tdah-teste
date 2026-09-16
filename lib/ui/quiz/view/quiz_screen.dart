@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../models/question.dart';
-import '../models/quiz_session.dart';
-import '../theme/app_theme.dart';
-import '../widgets/app_buttons.dart';
-import '../widgets/indicators.dart';
+import '../../../data/models/question.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_buttons.dart';
+import '../../core/widgets/indicators.dart';
+import '../view_model/quiz_view_model.dart';
 import 'result_screen.dart';
 import 'transition_screen.dart';
 
 /// Tela de perguntas de uma parte do teste (A ou B).
 ///
 /// Um card por pergunta, navegável por deslize e pelo botão inferior.
+/// As respostas são lidas e escritas no [QuizViewModel] compartilhado.
 class QuizScreen extends StatefulWidget {
   const QuizScreen({
     super.key,
-    required this.session,
     required this.questions,
     required this.partLabel,
     this.isLastPart = false,
   });
 
-  final QuizSession session;
   final List<Question> questions;
   final String partLabel;
 
@@ -36,17 +36,12 @@ class _QuizScreenState extends State<QuizScreen> {
   int _page = 0;
 
   Question get _current => widget.questions[_page];
-  bool get _currentAnswered => widget.session.answerFor(_current) != null;
   bool get _isLastQuestion => _page == widget.questions.length - 1;
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  void _select(Question q, int value) {
-    setState(() => widget.session.setAnswer(q, value));
   }
 
   void _next() {
@@ -58,16 +53,19 @@ class _QuizScreenState extends State<QuizScreen> {
       return;
     }
     // Conclusão da parte.
-    final route = MaterialPageRoute<void>(
-      builder: (_) => widget.isLastPart
-          ? ResultScreen(session: widget.session)
-          : TransitionScreen(session: widget.session),
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) =>
+            widget.isLastPart ? const ResultScreen() : const TransitionScreen(),
+      ),
     );
-    Navigator.of(context).push(route);
   }
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<QuizViewModel>();
+    final currentAnswered = viewModel.answerFor(_current) != null;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -91,8 +89,8 @@ class _QuizScreenState extends State<QuizScreen> {
                     return _QuestionPage(
                       partLabel: widget.partLabel,
                       question: q,
-                      selected: widget.session.answerFor(q),
-                      onSelected: (v) => _select(q, v),
+                      selected: viewModel.answerFor(q),
+                      onSelected: (v) => viewModel.selectAnswer(q, v),
                     );
                   },
                 ),
@@ -101,7 +99,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 padding: const EdgeInsets.only(top: 8, bottom: 24),
                 child: PrimaryButton(
                   label: 'Próxima pergunta',
-                  onPressed: _currentAnswered ? _next : null,
+                  onPressed: currentAnswered ? _next : null,
                 ),
               ),
             ],

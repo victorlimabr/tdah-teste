@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../models/quiz_session.dart';
-import '../theme/app_theme.dart';
-import '../widgets/app_buttons.dart';
-import '../widgets/highlight_text.dart';
-import '../widgets/tdah_logo.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_buttons.dart';
+import '../../core/widgets/highlight_text.dart';
+import '../../core/widgets/tdah_logo.dart';
+import '../view_model/quiz_view_model.dart';
 import 'quiz_screen.dart';
 
 /// Tela de transição entre a Parte A e a Parte B ("Parabéns!").
 ///
 /// O texto muda conforme o rastreio da Parte A foi positivo ou não.
 class TransitionScreen extends StatelessWidget {
-  const TransitionScreen({super.key, required this.session});
-
-  final QuizSession session;
+  const TransitionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final positive = session.isPartAScreenPositive;
+    final viewModel = context.watch<QuizViewModel>();
+    final positive = viewModel.isPartAScreenPositive;
 
     final body = positive
         ? const HighlightText([
@@ -42,8 +42,7 @@ class TransitionScreen extends StatelessWidget {
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => QuizScreen(
-            session: session,
-            questions: session.partB,
+            questions: viewModel.partB,
             partLabel: 'Parte B',
             isLastPart: true,
           ),

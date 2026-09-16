@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../models/quiz_session.dart';
-import '../theme/app_theme.dart';
-import '../widgets/app_buttons.dart';
-import '../widgets/highlight_text.dart';
-import '../widgets/tdah_logo.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_buttons.dart';
+import '../../core/widgets/highlight_text.dart';
+import '../../core/widgets/tdah_logo.dart';
+import '../view_model/quiz_view_model.dart';
 
 /// Tela de resultado final ("Parabéns!"), com mensagem conforme a triagem.
 class ResultScreen extends StatelessWidget {
-  const ResultScreen({super.key, required this.session});
-
-  final QuizSession session;
+  const ResultScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final positive = session.result.isScreenPositive;
+    final positive = context.watch<QuizViewModel>().result.isScreenPositive;
 
     final body = positive
         ? const HighlightText([
