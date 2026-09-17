@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../ui/onboarding/onboarding_screen.dart';
 import '../ui/quiz/view/part_intro_screen.dart';
 import '../ui/quiz/view/quiz_screen.dart';
+import '../ui/professionals/professionals_screen.dart';
 import '../ui/quiz/view/result_screen.dart';
 import '../ui/quiz/view/transition_screen.dart';
 import 'routes.dart';
@@ -35,6 +36,10 @@ GoRouter createAppRouter({String initialLocation = Routes.onboarding}) {
       GoRoute(
         path: Routes.result,
         builder: (context, state) => const ResultScreen(),
+      ),
+      GoRoute(
+        path: Routes.professionals,
+        builder: (context, state) => const ProfessionalsScreen(),
       ),
     ],
   );
