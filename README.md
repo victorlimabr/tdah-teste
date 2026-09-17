@@ -73,11 +73,9 @@ A interface é fiel a um protótipo de design (Material 3, fonte Inter, ilustra�
 |:---:|:---:|
 | <img src="docs/screenshots/05_pergunta.png" width="250" alt="Cartão de pergunta" /> | <img src="docs/screenshots/06_resultado.png" width="250" alt="Tela de resultado" /> |
 
-A partir do resultado é possível abrir a tela **Encontrar profissionais** (busca no mapa por especialidade, diretórios oficiais e apoio emocional):
-
-<p align="center">
-  <img src="docs/screenshots/07_encontrar_profissionais.png" width="250" alt="Tela Encontrar profissionais" />
-</p>
+| Encontrar Profissionais | |
+|:---:|:---:|
+| <img src="docs/screenshots/07_encontrar_profissionais.png" width="250" alt="Tela Encontrar profissionais" /> | |
 
 ---
 
