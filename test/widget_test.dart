@@ -1,10 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:tdah_teste/data/asrs_questions.dart';
+import 'package:tdah_teste/data/models/quiz_progress.dart';
 import 'package:tdah_teste/data/models/quiz_result.dart';
 import 'package:tdah_teste/data/repositories/question_repository.dart';
+import 'package:tdah_teste/data/repositories/quiz_progress_repository.dart';
 import 'package:tdah_teste/main.dart';
 import 'package:tdah_teste/routing/app_router.dart';
 import 'package:tdah_teste/routing/routes.dart';
@@ -12,6 +17,10 @@ import 'package:tdah_teste/ui/quiz/view/part_intro_screen.dart';
 import 'package:tdah_teste/ui/quiz/view_model/quiz_view_model.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() => SharedPreferences.setMockInitialValues({}));
+
   testWidgets('Onboarding mostra o título de boas-vindas e o botão Próximo',
       (WidgetTester tester) async {
     await tester.pumpWidget(const TdahTesteApp());
@@ -36,8 +45,14 @@ void main() {
       MultiProvider(
         providers: [
           Provider<QuestionRepository>(create: (_) => AsrsQuestionRepository()),
+          Provider<QuizProgressRepository>(
+            create: (_) => SharedPrefsQuizProgressRepository(),
+          ),
           ChangeNotifierProvider<QuizViewModel>(
-            create: (c) => QuizViewModel(c.read<QuestionRepository>()),
+            create: (c) => QuizViewModel(
+              c.read<QuestionRepository>(),
+              c.read<QuizProgressRepository>(),
+            ),
           ),
         ],
         child: MaterialApp.router(
@@ -57,6 +72,37 @@ void main() {
     expect(find.text('Próxima pergunta'), findsOneWidget);
   });
 
+  testWidgets('banner "Continuar de onde parei" aparece e retoma o teste',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final saved = QuizProgress(
+      answers: [4, ...List<int?>.filled(17, null)],
+      location: Routes.quizPartA,
+      questionIndex: 2,
+      updatedAt: DateTime(2026, 9, 16),
+    );
+    SharedPreferences.setMockInitialValues(
+      {'quiz_progress': jsonEncode(saved.toJson())},
+    );
+
+    await tester.pumpWidget(const TdahTesteApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Continuar de onde parei'), findsOneWidget);
+    expect(find.text('Parte A · pergunta 3 de 6'), findsOneWidget);
+
+    await tester.tap(find.text('Continuar de onde parei'));
+    await tester.pumpAndSettle();
+
+    // Retomou no cartão de perguntas da Parte A.
+    expect(find.text('Nunca'), findsOneWidget);
+    expect(find.text('Próxima pergunta'), findsOneWidget);
+  });
+
   testWidgets('telas centralizadas não estouram em tela baixa',
       (WidgetTester tester) async {
     // Tela bem baixa/estreita — reproduz o cenário que causava overflow.
@@ -69,8 +115,14 @@ void main() {
       MultiProvider(
         providers: [
           Provider<QuestionRepository>(create: (_) => AsrsQuestionRepository()),
+          Provider<QuizProgressRepository>(
+            create: (_) => SharedPrefsQuizProgressRepository(),
+          ),
           ChangeNotifierProvider<QuizViewModel>(
-            create: (c) => QuizViewModel(c.read<QuestionRepository>()),
+            create: (c) => QuizViewModel(
+              c.read<QuestionRepository>(),
+              c.read<QuizProgressRepository>(),
+            ),
           ),
         ],
         child: const MaterialApp(home: PartIntroScreen()),

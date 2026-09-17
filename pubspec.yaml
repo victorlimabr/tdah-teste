@@ -44,6 +44,9 @@ dependencies:
   # Navegação declarativa.
   go_router: ^14.6.2
 
+  # Persistência local (retomar o teste).
+  shared_preferences: ^2.3.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

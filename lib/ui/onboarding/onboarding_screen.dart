@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../routing/routes.dart';
 import '../core/theme/app_theme.dart';
@@ -7,6 +8,7 @@ import '../core/widgets/app_buttons.dart';
 import '../core/widgets/highlight_text.dart';
 import '../core/widgets/indicators.dart';
 import '../core/widgets/tdah_logo.dart';
+import '../quiz/view_model/quiz_view_model.dart';
 
 /// Fluxo de introdução: 3 telas deslizáveis (bem-vindo, como funciona,
 /// aviso importante), fiéis ao protótipo.
@@ -127,11 +129,17 @@ class _WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<QuizViewModel>();
     return _PageBody(
       children: [
         const SizedBox(height: 8),
+        if (viewModel.hasSavedProgress)
+          _ResumeBanner(
+            location: viewModel.resumeLocation!,
+            summary: _resumeSummary(viewModel),
+          ),
         const _Title('Bem-vindo ao Teste de sintomas de TDAH!'),
-        Image.asset('assets/images/group_hug.png', height: 250),
+        Image.asset('assets/images/group_hug.png', height: 220),
         const HighlightText([
           Seg('Nosso teste é baseado na '),
           Seg('escala ASRS-18', hl: true),
@@ -143,6 +151,81 @@ class _WelcomePage extends StatelessWidget {
         ]),
         const SizedBox(height: 8),
       ],
+    );
+  }
+
+  String _resumeSummary(QuizViewModel vm) {
+    final n = vm.resumeQuestionIndex + 1;
+    switch (vm.resumeLocation) {
+      case Routes.quizPartA:
+        return 'Parte A · pergunta $n de 6';
+      case Routes.quizPartB:
+        return 'Parte B · pergunta $n de 12';
+      case Routes.transition:
+        return 'Parte A concluída';
+      default:
+        return 'Retomar o teste';
+    }
+  }
+}
+
+/// Banner de retomada exibido no topo da tela de boas-vindas quando há um
+/// teste em andamento salvo.
+class _ResumeBanner extends StatelessWidget {
+  const _ResumeBanner({required this.location, required this.summary});
+
+  final String location;
+  final String summary;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: AppColors.selectedBg,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => context.go(location),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.primary, width: 1.5),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.history, color: AppColors.primary),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Continuar de onde parei',
+                        style: TextStyle(
+                          color: AppColors.navy,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        summary,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.arrow_forward, color: AppColors.primary),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
