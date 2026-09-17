@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'data/repositories/question_repository.dart';
 import 'data/repositories/quiz_progress_repository.dart';
+import 'data/services/share_service.dart';
 import 'data/services/url_launcher_service.dart';
 import 'routing/app_router.dart';
 import 'ui/core/theme/app_theme.dart';
@@ -25,6 +26,7 @@ class TdahTesteApp extends StatelessWidget {
           create: (_) => SharedPrefsQuizProgressRepository(),
         ),
         Provider<UrlLauncherService>(create: (_) => DefaultUrlLauncherService()),
+        Provider<ShareService>(create: (_) => SharePlusShareService()),
         ChangeNotifierProvider<QuizViewModel>(
           create: (context) => QuizViewModel(
             context.read<QuestionRepository>(),

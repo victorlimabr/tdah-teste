@@ -125,4 +125,16 @@ class QuizViewModel extends ChangeNotifier {
 
   QuizResult get result =>
       QuizResult.fromAnswers(_questionRepository.questions, _answers);
+
+  /// Mensagem para compartilhar o resultado (texto condicional à triagem).
+  String shareMessage() {
+    final verdict = result.isScreenPositive
+        ? 'a triagem indicou compatibilidade com sintomas de TDAH — vale '
+            'procurar uma avaliação profissional.'
+        : 'a triagem não indicou um número significativo de sintomas.';
+    return 'Fiz a autoavaliação de sintomas de TDAH (escala ASRS-18). '
+        'No meu resultado, $verdict\n\n'
+        '⚠️ Este teste não é um diagnóstico. Só um profissional de saúde '
+        'pode diagnosticar TDAH.';
+  }
 }

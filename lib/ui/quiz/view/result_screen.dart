@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../data/services/share_service.dart';
 import '../../../routing/routes.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_buttons.dart';
@@ -14,9 +15,22 @@ import '../view_model/quiz_view_model.dart';
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
 
+  Future<void> _share(BuildContext context, QuizViewModel viewModel) async {
+    try {
+      await context.read<ShareService>().share(viewModel.shareMessage());
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Não foi possível compartilhar.')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final positive = context.watch<QuizViewModel>().result.isScreenPositive;
+    final viewModel = context.watch<QuizViewModel>();
+    final positive = viewModel.result.isScreenPositive;
 
     final body = positive
         ? const HighlightText([
@@ -47,9 +61,20 @@ class ResultScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 24, bottom: 8),
-                child: Align(alignment: Alignment.centerLeft, child: TdahLogo()),
+              Padding(
+                padding: const EdgeInsets.only(top: 24, bottom: 8),
+                child: Row(
+                  children: [
+                    const TdahLogo(),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: () => _share(context, viewModel),
+                      icon: const Icon(Icons.share_outlined,
+                          color: AppColors.primary),
+                      tooltip: 'Compartilhar resultado',
+                    ),
+                  ],
+                ),
               ),
               Expanded(
                 child: CenteredScrollView(
