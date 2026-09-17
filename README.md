@@ -56,6 +56,7 @@ A interface é fiel a um protótipo de design (Material 3, fonte Inter, ilustra�
 - Mensagem de resultado **condicional** — o texto muda conforme a triagem indica ou não compatibilidade com sintomas de TDAH
 - Orientação para procurar avaliação profissional
 - **Encontrar profissionais** — busca no mapa por especialidade (psiquiatra, psicólogo, neurologista), links para diretórios oficiais (CFP/CFM) e contato de apoio emocional (CVV 188)
+- **Compartilhar o resultado** — ícone que abre a folha de compartilhamento do sistema com uma mensagem pronta (condicional à triagem, com aviso de que não é diagnóstico)
 
 ---
 
@@ -103,6 +104,7 @@ A pontuação segue fielmente a regra da escala ASRS-18:
 | Navegação | [go_router](https://pub.dev/packages/go_router) |
 | Persistência local | [shared_preferences](https://pub.dev/packages/shared_preferences) |
 | Links externos (mapa/site/telefone) | [url_launcher](https://pub.dev/packages/url_launcher) |
+| Compartilhamento | [share_plus](https://pub.dev/packages/share_plus) |
 | Ícones | [cupertino_icons](https://pub.dev/packages/cupertino_icons) |
 | Lints | [flutter_lints](https://pub.dev/packages/flutter_lints) |
 | Testes | flutter_test |
@@ -261,12 +263,13 @@ Estado atual da arquitetura e próximos passos planejados:
 - ✅ Arquitetura **MVVM** (View + ViewModel + Repository)
 - ✅ Estado com **provider** e navegação declarativa com **go_router**
 - ✅ **Persistência das respostas** com [`shared_preferences`](https://pub.dev/packages/shared_preferences) — o progresso é salvo automaticamente e a tela inicial mostra um banner **"Continuar de onde parei"** que retoma o teste no cartão exato
+- ✅ **Compartilhar o resultado** (texto) com [`share_plus`](https://pub.dev/packages/share_plus) — ícone na tela de resultado que abre a folha de compartilhamento do sistema com uma mensagem pronta
 - ✅ Testes de unidade e de widget
 
 **Planejado**
 - ⏳ **CI (GitHub Actions)** — rodar `flutter analyze` + `flutter test` a cada Pull Request.
 - ⏳ **Guard de rota** — impedir o acesso direto ao resultado sem responder o teste.
-- ⏳ **Compartilhar o resultado**.
+- ⏳ **Compartilhar como imagem** — gerar um card de resultado e compartilhá-lo como imagem (v2).
 
 ---
 

@@ -105,4 +105,19 @@ void main() {
     expect(progress.stored, isNull);
     expect(viewModel.hasSavedProgress, isFalse);
   });
+
+  test('shareMessage reflete o resultado positivo', () {
+    for (final q in repository.questions) {
+      viewModel.selectAnswer(q, 4);
+    }
+
+    final message = viewModel.shareMessage();
+    expect(message, contains('compatibilidade com sintomas de TDAH'));
+    expect(message, contains('não é um diagnóstico'));
+  });
+
+  test('shareMessage reflete o resultado negativo', () {
+    final message = viewModel.shareMessage(); // sem respostas -> negativo
+    expect(message, contains('não indicou um número significativo'));
+  });
 }

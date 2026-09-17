@@ -50,6 +50,9 @@ dependencies:
   # Abrir mapa, sites e telefone (encontrar profissionais).
   url_launcher: ^6.3.1
 
+  # Compartilhar o resultado (folha de compartilhamento nativa).
+  share_plus: ^10.1.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
