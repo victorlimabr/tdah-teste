@@ -6,4 +6,5 @@ abstract class Routes {
   static const quizPartB = '/quiz/b';
   static const transition = '/transition';
   static const result = '/result';
+  static const professionals = '/professionals';
 }

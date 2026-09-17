@@ -82,13 +82,7 @@ class ResultScreen extends StatelessWidget {
               if (positive) ...[
                 TonalButton(
                   label: 'Encontrar profissionais próximo',
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Em breve: busca de profissionais.'),
-                      ),
-                    );
-                  },
+                  onPressed: () => context.push(Routes.professionals),
                 ),
                 const SizedBox(height: 12),
               ],

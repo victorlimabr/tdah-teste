@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'data/repositories/question_repository.dart';
 import 'data/repositories/quiz_progress_repository.dart';
+import 'data/services/url_launcher_service.dart';
 import 'routing/app_router.dart';
 import 'ui/core/theme/app_theme.dart';
 import 'ui/quiz/view_model/quiz_view_model.dart';
@@ -23,6 +24,7 @@ class TdahTesteApp extends StatelessWidget {
         Provider<QuizProgressRepository>(
           create: (_) => SharedPrefsQuizProgressRepository(),
         ),
+        Provider<UrlLauncherService>(create: (_) => DefaultUrlLauncherService()),
         ChangeNotifierProvider<QuizViewModel>(
           create: (context) => QuizViewModel(
             context.read<QuestionRepository>(),
