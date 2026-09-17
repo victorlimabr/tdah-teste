@@ -55,6 +55,7 @@ A interface é fiel a um protótipo de design (Material 3, fonte Inter, ilustra�
 - Cálculo automático da triagem da **Parte A** (regra oficial da escala)
 - Mensagem de resultado **condicional** — o texto muda conforme a triagem indica ou não compatibilidade com sintomas de TDAH
 - Orientação para procurar avaliação profissional
+- **Encontrar profissionais** — busca no mapa por especialidade (psiquiatra, psicólogo, neurologista), links para diretórios oficiais (CFP/CFM) e contato de apoio emocional (CVV 188)
 
 ---
 
@@ -97,6 +98,7 @@ A pontuação segue fielmente a regra da escala ASRS-18:
 | Estado / Injeção de dependência | [provider](https://pub.dev/packages/provider) |
 | Navegação | [go_router](https://pub.dev/packages/go_router) |
 | Persistência local | [shared_preferences](https://pub.dev/packages/shared_preferences) |
+| Links externos (mapa/site/telefone) | [url_launcher](https://pub.dev/packages/url_launcher) |
 | Ícones | [cupertino_icons](https://pub.dev/packages/cupertino_icons) |
 | Lints | [flutter_lints](https://pub.dev/packages/flutter_lints) |
 | Testes | flutter_test |
