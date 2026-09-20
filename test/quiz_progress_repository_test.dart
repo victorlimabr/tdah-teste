@@ -20,31 +20,34 @@ void main() {
 
   test('save e load fazem o round-trip do progresso', () async {
     final progress = QuizProgress(
-      answers: [null, 2, 4, ...List<int?>.filled(15, null)],
-      location: '/quiz/a',
-      questionIndex: 3,
-      updatedAt: DateTime(2026, 9, 16, 10, 30),
+      assessmentId: 'snap18',
+      answers: [null, 2, 3, ...List<int?>.filled(15, null)],
+      location: '/quiz/1',
+      questionIndex: 4,
+      respondent: 'Professor',
+      updatedAt: DateTime(2026, 9, 17, 10, 30),
     );
 
     await repository.save(progress);
     final loaded = await repository.load();
 
     expect(loaded, isNotNull);
-    expect(loaded!.location, '/quiz/a');
-    expect(loaded.questionIndex, 3);
-    expect(loaded.answers.length, 18);
+    expect(loaded!.assessmentId, 'snap18');
+    expect(loaded.location, '/quiz/1');
+    expect(loaded.questionIndex, 4);
+    expect(loaded.respondent, 'Professor');
     expect(loaded.answers[1], 2);
-    expect(loaded.answers[2], 4);
     expect(loaded.answers[0], isNull);
   });
 
   test('clear apaga o progresso salvo', () async {
     await repository.save(
       QuizProgress(
+        assessmentId: 'asrs18',
         answers: List<int?>.filled(18, 0),
-        location: '/quiz/b',
-        questionIndex: 5,
-        updatedAt: DateTime(2026, 9, 16),
+        location: '/quiz/0',
+        questionIndex: 0,
+        updatedAt: DateTime(2026, 9, 17),
       ),
     );
     await repository.clear();

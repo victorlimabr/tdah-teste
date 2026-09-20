@@ -11,7 +11,7 @@ import '../../core/widgets/highlight_text.dart';
 import '../../core/widgets/tdah_logo.dart';
 import '../view_model/quiz_view_model.dart';
 
-/// Tela de resultado final ("Parabéns!"), com mensagem conforme a triagem.
+/// Tela de resultado do teste, com conteúdo do [Assessment].
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
 
@@ -30,29 +30,9 @@ class ResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<QuizViewModel>();
-    final positive = viewModel.result.isScreenPositive;
-
-    final body = positive
-        ? const HighlightText([
-            Seg('A triagem indicou '),
-            Seg('compatibilidade com sintomas de TDAH', hl: true),
-            Seg(', é importante '),
-            Seg('procurar um médico ou psicólogo especializado', hl: true),
-            Seg(' para '),
-            Seg('confirmar o diagnóstico', hl: true),
-            Seg(' e '),
-            Seg('discutir possíveis tratamentos.', hl: true),
-          ])
-        : const HighlightText([
-            Seg('A triagem '),
-            Seg('não indicou um número significativo de sintomas', hl: true),
-            Seg(' de TDAH. Se ainda assim eles '),
-            Seg('afetam o seu dia a dia', hl: true),
-            Seg(', vale conversar com um '),
-            Seg('profissional de saúde.', hl: true),
-          ]);
-
-    void finish() => context.go(Routes.onboarding);
+    final result = viewModel.result;
+    final content = viewModel.assessment!.resultContent(result);
+    final positive = result.isPositive;
 
     return Scaffold(
       body: SafeArea(
@@ -81,26 +61,26 @@ class ResultScreen extends StatelessWidget {
                   children: [
                     Image.asset('assets/images/group_hug.png', height: 230),
                     const SizedBox(height: 36),
-                    const Text(
-                      'Parabéns!',
-                      style: TextStyle(
+                    Text(
+                      content.headline,
+                      style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Você completou o teste!',
+                    Text(
+                      content.subtitle,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    body,
+                    HighlightText(content.body),
                   ],
                 ),
               ),
@@ -111,7 +91,10 @@ class ResultScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
               ],
-              PrimaryButton(label: 'Finalizar', onPressed: finish),
+              PrimaryButton(
+                label: 'Finalizar',
+                onPressed: () => context.go(Routes.catalog),
+              ),
               const SizedBox(height: 24),
             ],
           ),

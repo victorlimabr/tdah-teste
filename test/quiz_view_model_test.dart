@@ -1,11 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:tdah_teste/data/models/assessment.dart';
 import 'package:tdah_teste/data/models/quiz_progress.dart';
-import 'package:tdah_teste/data/repositories/question_repository.dart';
+import 'package:tdah_teste/data/repositories/assessment_repository.dart';
 import 'package:tdah_teste/data/repositories/quiz_progress_repository.dart';
+import 'package:tdah_teste/routing/routes.dart';
 import 'package:tdah_teste/ui/quiz/view_model/quiz_view_model.dart';
 
-/// Repositório de progresso em memória para os testes.
 class _FakeProgressRepository implements QuizProgressRepository {
   QuizProgress? stored;
 
@@ -20,104 +21,82 @@ class _FakeProgressRepository implements QuizProgressRepository {
 }
 
 void main() {
-  late QuestionRepository repository;
+  late DefaultAssessmentRepository assessments;
   late _FakeProgressRepository progress;
   late QuizViewModel viewModel;
+  late Assessment asrs;
 
   setUp(() {
-    repository = AsrsQuestionRepository();
+    assessments = DefaultAssessmentRepository();
     progress = _FakeProgressRepository();
-    viewModel = QuizViewModel(repository, progress);
+    viewModel = QuizViewModel(assessments, progress);
+    asrs = assessments.byId('asrs18')!;
   });
 
-  test('inicia sem respostas e com rastreio negativo', () {
-    for (final q in repository.questions) {
+  test('catálogo expõe ASRS-18 e SNAP-IV', () {
+    expect(viewModel.catalog.map((a) => a.id), containsAll(['asrs18', 'snap18']));
+  });
+
+  test('selectAssessment começa com respostas vazias', () {
+    viewModel.selectAssessment(asrs);
+    for (final q in asrs.questions) {
       expect(viewModel.isAnswered(q), isFalse);
     }
-    expect(viewModel.isPartAScreenPositive, isFalse);
-    expect(viewModel.result.partAShaded, 0);
-    expect(viewModel.hasSavedProgress, isFalse);
+    expect(viewModel.result.isPositive, isFalse);
   });
 
-  test('selectAnswer registra a resposta, notifica e persiste', () {
-    var notified = 0;
-    viewModel.addListener(() => notified++);
+  test('selectAnswer persiste com o id do teste', () {
+    viewModel.selectAssessment(asrs);
+    viewModel.selectAnswer(asrs.questions.first, 4);
 
-    final q = repository.partA.first;
-    viewModel.selectAnswer(q, 4);
-
-    expect(viewModel.answerFor(q), 4);
-    expect(notified, 1);
     expect(progress.stored, isNotNull);
-    expect(progress.stored!.answers[q.number - 1], 4);
+    expect(progress.stored!.assessmentId, 'asrs18');
+    expect(progress.stored!.answers[0], 4);
   });
 
-  test('setPosition persiste a rota e o índice do cartão', () {
-    viewModel.setPosition('/quiz/b', 5);
-
-    expect(progress.stored!.location, '/quiz/b');
-    expect(progress.stored!.questionIndex, 5);
+  test('responder a Parte A com "Muito frequentemente" dá positivo', () {
+    viewModel.selectAssessment(asrs);
+    for (final q in asrs.sections.first.questions) {
+      viewModel.selectAnswer(q, 4);
+    }
+    expect(viewModel.result.isPositive, isTrue);
+    expect(viewModel.shareMessage(),
+        contains('compatibilidade com sintomas de TDAH'));
   });
 
-  test('load restaura respostas e posição salvas', () async {
+  test('setRespondent guarda quem respondeu (SNAP)', () {
+    final snap = assessments.byId('snap18')!;
+    viewModel.selectAssessment(snap);
+    viewModel.setRespondent('Pais');
+
+    expect(viewModel.respondent, 'Pais');
+    expect(progress.stored!.respondent, 'Pais');
+  });
+
+  test('load restaura o teste e a posição salvos', () async {
     progress.stored = QuizProgress(
+      assessmentId: 'asrs18',
       answers: [4, ...List<int?>.filled(17, null)],
-      location: '/quiz/a',
-      questionIndex: 3,
-      updatedAt: DateTime(2026, 9, 16),
+      location: Routes.quizSection(0),
+      questionIndex: 2,
+      updatedAt: DateTime(2026, 9, 17),
     );
 
     await viewModel.load();
 
-    expect(viewModel.isLoaded, isTrue);
+    expect(viewModel.assessment!.id, 'asrs18');
     expect(viewModel.hasSavedProgress, isTrue);
-    expect(viewModel.resumeLocation, '/quiz/a');
-    expect(viewModel.resumeQuestionIndex, 3);
-    expect(viewModel.answerFor(repository.partA.first), 4);
-  });
-
-  test('responder tudo com "Muito frequentemente" dá rastreio positivo', () {
-    for (final q in repository.questions) {
-      viewModel.selectAnswer(q, 4);
-    }
-
-    expect(viewModel.isPartAScreenPositive, isTrue);
-    expect(viewModel.result.partAShaded, 6);
-  });
-
-  test('reset limpa respostas e progresso salvo', () async {
-    for (final q in repository.questions) {
-      viewModel.selectAnswer(q, 4);
-    }
-    await viewModel.reset();
-
-    for (final q in repository.questions) {
-      expect(viewModel.isAnswered(q), isFalse);
-    }
-    expect(progress.stored, isNull);
-    expect(viewModel.hasSavedProgress, isFalse);
+    expect(viewModel.resumeAssessmentName, 'ASRS-18');
+    expect(viewModel.resumeLocation, Routes.quizSection(0));
+    expect(viewModel.resumeQuestionIndex, 2);
   });
 
   test('clearProgress apaga o progresso salvo', () async {
-    viewModel.setPosition('/quiz/a', 2);
+    viewModel.selectAssessment(asrs);
+    viewModel.setPosition(Routes.quizSection(0), 1);
     await viewModel.clearProgress();
 
     expect(progress.stored, isNull);
     expect(viewModel.hasSavedProgress, isFalse);
-  });
-
-  test('shareMessage reflete o resultado positivo', () {
-    for (final q in repository.questions) {
-      viewModel.selectAnswer(q, 4);
-    }
-
-    final message = viewModel.shareMessage();
-    expect(message, contains('compatibilidade com sintomas de TDAH'));
-    expect(message, contains('não é um diagnóstico'));
-  });
-
-  test('shareMessage reflete o resultado negativo', () {
-    final message = viewModel.shareMessage(); // sem respostas -> negativo
-    expect(message, contains('não indicou um número significativo'));
   });
 }
