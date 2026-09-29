@@ -1,37 +1,46 @@
 import 'package:go_router/go_router.dart';
 
+import '../ui/catalog/catalog_screen.dart';
 import '../ui/onboarding/onboarding_screen.dart';
-import '../ui/quiz/view/part_intro_screen.dart';
-import '../ui/quiz/view/quiz_screen.dart';
 import '../ui/professionals/professionals_screen.dart';
+import '../ui/quiz/view/quiz_screen.dart';
 import '../ui/quiz/view/result_screen.dart';
 import '../ui/quiz/view/transition_screen.dart';
+import '../ui/respondent/respondent_screen.dart';
 import 'routes.dart';
 
 /// Cria o roteador do app. O [initialLocation] facilita testes.
-GoRouter createAppRouter({String initialLocation = Routes.onboarding}) {
+GoRouter createAppRouter({String initialLocation = Routes.catalog}) {
   return GoRouter(
     initialLocation: initialLocation,
     routes: [
       GoRoute(
-        path: Routes.onboarding,
-        builder: (context, state) => const OnboardingScreen(),
+        path: Routes.catalog,
+        builder: (context, state) => const CatalogScreen(),
       ),
       GoRoute(
         path: Routes.intro,
-        builder: (context, state) => const PartIntroScreen(),
+        builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
-        path: '/quiz/:part',
+        path: Routes.respondent,
+        builder: (context, state) => const RespondentScreen(),
+      ),
+      GoRoute(
+        path: '/quiz/:section',
         builder: (context, state) {
-          final part =
-              state.pathParameters['part'] == 'b' ? QuizPart.b : QuizPart.a;
-          return QuizScreen(part: part);
+          final index =
+              int.tryParse(state.pathParameters['section'] ?? '0') ?? 0;
+          return QuizScreen(sectionIndex: index);
         },
       ),
       GoRoute(
-        path: Routes.transition,
-        builder: (context, state) => const TransitionScreen(),
+        path: '/transition/:after',
+        builder: (context, state) {
+          final index =
+              int.tryParse(state.pathParameters['after'] ?? '0') ?? 0;
+          return TransitionScreen(afterSection: index);
+        },
       ),
       GoRoute(
         path: Routes.result,

@@ -9,17 +9,11 @@ import '../../core/widgets/app_buttons.dart';
 import '../../core/widgets/indicators.dart';
 import '../view_model/quiz_view_model.dart';
 
-/// Parte do teste exibida pela [QuizScreen].
-enum QuizPart { a, b }
-
-/// Tela de perguntas de uma parte do teste (A ou B).
-///
-/// Um card por pergunta, navegável por deslize e pelo botão inferior.
-/// As perguntas e respostas vêm do [QuizViewModel] compartilhado.
+/// Tela de perguntas de uma seção do teste selecionado.
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key, required this.part});
+  const QuizScreen({super.key, required this.sectionIndex});
 
-  final QuizPart part;
+  final int sectionIndex;
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -34,10 +28,8 @@ class _QuizScreenState extends State<QuizScreen> {
   void initState() {
     super.initState();
     final viewModel = context.read<QuizViewModel>();
-    final isPartA = widget.part == QuizPart.a;
-    _location = isPartA ? Routes.quizPartA : Routes.quizPartB;
-    final total = (isPartA ? viewModel.partA : viewModel.partB).length;
-    // Retoma no cartão salvo quando a rota salva corresponde a esta parte.
+    _location = Routes.quizSection(widget.sectionIndex);
+    final total = viewModel.sections[widget.sectionIndex].questions.length;
     final resume = viewModel.currentLocation == _location
         ? viewModel.currentQuestionIndex.clamp(0, total - 1)
         : 0;
@@ -57,9 +49,10 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<QuizViewModel>();
-    final isPartA = widget.part == QuizPart.a;
-    final questions = isPartA ? viewModel.partA : viewModel.partB;
-    final partLabel = isPartA ? 'Parte A' : 'Parte B';
+    final section = viewModel.sections[widget.sectionIndex];
+    final questions = section.questions;
+    final scale = viewModel.scale;
+    final isLastSection = widget.sectionIndex == viewModel.sections.length - 1;
 
     final current = questions[_page];
     final currentAnswered = viewModel.answerFor(current) != null;
@@ -73,13 +66,18 @@ class _QuizScreenState extends State<QuizScreen> {
         );
         return;
       }
-      // Conclusão da parte.
-      if (isPartA) {
-        viewModel.setPosition(Routes.transition, 0);
-        context.go(Routes.transition);
-      } else {
+      if (isLastSection) {
         viewModel.clearProgress();
         context.go(Routes.result);
+        return;
+      }
+      final transition = viewModel.assessment!
+          .transitionAfter(widget.sectionIndex, viewModel.result);
+      if (transition != null) {
+        viewModel.setPosition(Routes.transitionAfter(widget.sectionIndex), 0);
+        context.go(Routes.transitionAfter(widget.sectionIndex));
+      } else {
+        context.go(Routes.quizSection(widget.sectionIndex + 1));
       }
     }
 
@@ -91,7 +89,8 @@ class _QuizScreenState extends State<QuizScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 24, 0, 24),
-                child: StepsIndicator(total: questions.length, current: _page),
+                child:
+                    StepsIndicator(total: questions.length, current: _page),
               ),
               Expanded(
                 child: PageView.builder(
@@ -104,8 +103,9 @@ class _QuizScreenState extends State<QuizScreen> {
                   itemBuilder: (context, index) {
                     final q = questions[index];
                     return _QuestionPage(
-                      partLabel: partLabel,
+                      sectionLabel: section.label,
                       question: q,
+                      options: scale,
                       selected: viewModel.answerFor(q),
                       onSelected: (v) => viewModel.selectAnswer(q, v),
                     );
@@ -129,14 +129,16 @@ class _QuizScreenState extends State<QuizScreen> {
 
 class _QuestionPage extends StatelessWidget {
   const _QuestionPage({
-    required this.partLabel,
+    required this.sectionLabel,
     required this.question,
+    required this.options,
     required this.selected,
     required this.onSelected,
   });
 
-  final String partLabel;
+  final String sectionLabel;
   final Question question;
+  final List<String> options;
   final int? selected;
   final ValueChanged<int> onSelected;
 
@@ -147,7 +149,7 @@ class _QuestionPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            partLabel,
+            sectionLabel.toUpperCase(),
             style: const TextStyle(
               color: AppColors.primary,
               fontSize: 16,
@@ -166,11 +168,11 @@ class _QuestionPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 40),
-          for (var i = 0; i < kAnswerOptions.length; i++)
+          for (var i = 0; i < options.length; i++)
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: _OptionTile(
-                label: kAnswerOptions[i],
+                label: options[i],
                 selected: selected == i,
                 onTap: () => onSelected(i),
               ),

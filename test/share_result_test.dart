@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
 import 'package:tdah_teste/data/models/quiz_progress.dart';
-import 'package:tdah_teste/data/repositories/question_repository.dart';
+import 'package:tdah_teste/data/repositories/assessment_repository.dart';
 import 'package:tdah_teste/data/repositories/quiz_progress_repository.dart';
 import 'package:tdah_teste/data/services/share_service.dart';
 import 'package:tdah_teste/ui/quiz/view/result_screen.dart';
@@ -30,9 +30,16 @@ class _FakeProgressRepository implements QuizProgressRepository {
 void main() {
   testWidgets('botão de compartilhar aciona o ShareService com a mensagem',
       (WidgetTester tester) async {
-    final repository = AsrsQuestionRepository();
-    final viewModel = QuizViewModel(repository, _FakeProgressRepository());
-    for (final q in repository.questions) {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final assessments = DefaultAssessmentRepository();
+    final viewModel = QuizViewModel(assessments, _FakeProgressRepository());
+    final asrs = assessments.byId('asrs18')!;
+    viewModel.selectAssessment(asrs);
+    for (final q in asrs.sections.first.questions) {
       viewModel.selectAnswer(q, 4); // resultado positivo
     }
     final share = _FakeShareService();

@@ -10,37 +10,20 @@ import '../../core/widgets/highlight_text.dart';
 import '../../core/widgets/tdah_logo.dart';
 import '../view_model/quiz_view_model.dart';
 
-/// Tela de transição entre a Parte A e a Parte B ("Parabéns!").
-///
-/// O texto muda conforme o rastreio da Parte A foi positivo ou não.
+/// Tela de transição entre seções ("Parabéns!"), com conteúdo do teste.
 class TransitionScreen extends StatelessWidget {
-  const TransitionScreen({super.key});
+  const TransitionScreen({super.key, required this.afterSection});
+
+  final int afterSection;
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<QuizViewModel>();
-    final positive = viewModel.isPartAScreenPositive;
-
-    final body = positive
-        ? const HighlightText([
-            Seg('O resultado sugere uma '),
-            Seg('compatibilidade alta com um possível diagnóstico', hl: true),
-            Seg(', recomendando uma '),
-            Seg('investigação médica.', hl: true),
-            Seg(' Vamos para a parte B para uma '),
-            Seg('análise mais detalhada', hl: true),
-            Seg(' para apoiar a avaliação.'),
-          ])
-        : const HighlightText([
-            Seg('Os critérios de triagem para TDAH '),
-            Seg('não foram atendidos', hl: true),
-            Seg('. A '),
-            Seg('parte B ainda pode ser preenchida', hl: true),
-            Seg(' para fornecer informações adicionais, mas '),
-            Seg('não é obrigatória.', hl: true),
-          ]);
-
-    void goToPartB() => context.go(Routes.quizPartB);
+    final content =
+        viewModel.assessment!.transitionAfter(afterSection, viewModel.result);
+    if (content == null) {
+      return const Scaffold(body: SizedBox.shrink());
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -58,37 +41,38 @@ class TransitionScreen extends StatelessWidget {
                   children: [
                     Image.asset('assets/images/group_hug.png', height: 230),
                     const SizedBox(height: 36),
-                    const Text(
-                      'Parabéns!',
-                      style: TextStyle(
+                    Text(
+                      content.title,
+                      style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Você completou a primeira parte do teste!',
+                    Text(
+                      content.subtitle,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    body,
+                    HighlightText(content.body),
                   ],
                 ),
               ),
               PrimaryButton(
-                label: 'Continuar para a parte B',
-                onPressed: goToPartB,
+                label: 'Continuar',
+                onPressed: () =>
+                    context.go(Routes.quizSection(afterSection + 1)),
               ),
-              if (!positive)
+              if (content.showExit)
                 TextLinkButton(
                   label: 'Sair',
-                  onPressed: () => context.go(Routes.onboarding),
+                  onPressed: () => context.go(Routes.catalog),
                 ),
               const SizedBox(height: 16),
             ],

@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../data/models/text_segment.dart';
 import '../theme/app_theme.dart';
 
-/// Um trecho de texto que pode estar em destaque (azul e negrito).
-class Seg {
-  const Seg(this.text, {this.hl = false});
-  final String text;
-  final bool hl;
-}
+export '../../../data/models/text_segment.dart' show Seg;
 
 /// Parágrafo com trechos destacados em azul/negrito, como no protótipo.
 ///

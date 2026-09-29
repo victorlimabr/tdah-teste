@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'data/repositories/question_repository.dart';
+import 'data/repositories/assessment_repository.dart';
 import 'data/repositories/quiz_progress_repository.dart';
 import 'data/services/share_service.dart';
 import 'data/services/url_launcher_service.dart';
@@ -21,7 +21,9 @@ class TdahTesteApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<QuestionRepository>(create: (_) => AsrsQuestionRepository()),
+        Provider<AssessmentRepository>(
+          create: (_) => DefaultAssessmentRepository(),
+        ),
         Provider<QuizProgressRepository>(
           create: (_) => SharedPrefsQuizProgressRepository(),
         ),
@@ -29,7 +31,7 @@ class TdahTesteApp extends StatelessWidget {
         Provider<ShareService>(create: (_) => SharePlusShareService()),
         ChangeNotifierProvider<QuizViewModel>(
           create: (context) => QuizViewModel(
-            context.read<QuestionRepository>(),
+            context.read<AssessmentRepository>(),
             context.read<QuizProgressRepository>(),
           )..load(),
         ),
