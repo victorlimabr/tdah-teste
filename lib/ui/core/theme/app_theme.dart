@@ -17,11 +17,11 @@ class AppColors {
   /// Azul claro dos passos inativos (#A8BCF0).
   static const Color stepInactive = Color(0xFFA8BCF0);
 
-  /// Borda das opções não selecionadas (#CFD6DC).
-  static const Color optionBorder = Color(0xFFCFD6DC);
+  /// Borda das opções não selecionadas (#AEB8C2).
+  static const Color optionBorder = Color(0xFFAEB8C2);
 
-  /// Texto das opções não selecionadas (#ABB7C2).
-  static const Color optionText = Color(0xFFABB7C2);
+  /// Texto das opções não selecionadas (#717E8C).
+  static const Color optionText = Color(0xFF717E8C);
 
   /// Fundo da opção selecionada e do botão tonal (#F0F4FF).
   static const Color selectedBg = Color(0xFFF0F4FF);

@@ -56,7 +56,7 @@ class CatalogScreen extends StatelessWidget {
             ],
             const SizedBox(height: 8),
             const Text(
-              'Nenhum teste é diagnóstico — apenas um ponto de partida.',
+              'Nenhum teste é diagnóstico, apenas um ponto de partida.',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.optionText, fontSize: 12),
             ),
