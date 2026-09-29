@@ -88,7 +88,7 @@ class Snap18Assessment extends Assessment {
             [
               Seg('Deve ser respondido por quem '),
               Seg('convive com a criança', hl: true),
-              Seg(' — pais ou professores.'),
+              Seg(' - pais ou professores.'),
             ],
             [
               Seg('Lembre-se:', hl: true),
