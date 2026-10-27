@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'data/repositories/assessment_repository.dart';
@@ -11,6 +14,12 @@ import 'ui/quiz/view_model/quiz_view_model.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  // A Inter vem embutida em assets/google_fonts/; nunca baixar da internet.
+  GoogleFonts.config.allowRuntimeFetching = false;
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('assets/google_fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+  });
   runApp(const TdahTesteApp());
 }
 
