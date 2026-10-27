@@ -93,6 +93,8 @@ flutter:
 
   assets:
     - assets/images/
+    # Inter embutida (lida pelo google_fonts sem baixar da internet).
+    - assets/google_fonts/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
