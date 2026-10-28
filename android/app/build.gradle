@@ -16,7 +16,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "io.github.victorlimabr.foco"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -32,8 +32,10 @@ android {
         applicationId = "io.github.victorlimabr.foco"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        // 24 (Android 7.0): mínimo exigido pela Proteção Automática do Google Play.
+        minSdk = 24
+        // 36 (Android 16): mínimo exigido pelo Google Play para apps novos.
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
